@@ -14,6 +14,9 @@ use Illuminate\Http\Request;
  * @link https://github.com/ViniciusSCS
  * @date 2024-08-23 21:48:54
  * @copyright UniEVANGÉLICA
+ 
+ * Atualizado por TheGodwin ~Tmj bro~
+ * 
  */
 class UserController extends Controller
 {
@@ -22,13 +25,21 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::select('id', 'name', 'email')->paginate(2);
+        $user = User::select('id', 'name', 'email')->paginate('2');
 
         return [
             'status' => 200,
-            'mensagem' => 'Usuários encontrados!',
+            'menssagem' => 'Usuários encontrados!!',
             'user' => $user
         ];
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+
     }
 
     /**
@@ -36,7 +47,7 @@ class UserController extends Controller
      */
     public function store(UserCreateRequest $request)
     {
-        $data = $request->validated();
+        $data = $request->all();
 
         $user = User::create([
             'name' => $data['name'],
@@ -46,9 +57,25 @@ class UserController extends Controller
 
         return [
             'status' => 200,
-            'mensagem' => 'Usuário cadastrado com sucesso!',
+            'menssagem' => 'Usuário cadastrado com sucesso!!',
             'user' => $user
         ];
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
     }
 
     /**
@@ -56,14 +83,21 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $user = User::findOrFail($id);
+        $checkData = $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|string|email|unique:users,email,' . $id,
+        ]);
 
-        $data = $request->only(['name', 'email', 'password']);
-        if (isset($data['password'])) {
-            $data['password'] = bcrypt($data['password']);
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'status' => 404,
+                'mensagem' => 'Usuário não encontrado'
+            ], 404);
         }
 
-        $user->update($data);
+        $user->update($checkData);
 
         return [
             'status' => 200,
@@ -77,7 +111,15 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'status' => 404,
+                'mensagem' => 'Usuário não encontrado. Deu ruim :('
+            ], 404);
+        }
+
         $user->delete();
 
         return [

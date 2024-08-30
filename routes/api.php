@@ -7,6 +7,6 @@ Route::post('/cadastrar', [UserController::class, 'store']);
 
 Route::prefix('/user')->group(function (){
     Route::get('/', [UserController::class, 'index']);
-    Route::put('/{id}', [UserController::class, 'update']);   // Rota para atualizar o usuário
-    Route::delete('/{id}', [UserController::class, 'destroy']); // Rota para deletar o usuário
+    Route::put('/{id}', [UserController::class, 'update']);
+    Route::delete('/{id}', [UserController::class, 'destroy']);
 });
