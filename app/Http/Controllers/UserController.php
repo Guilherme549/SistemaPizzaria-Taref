@@ -22,21 +22,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::select('id', 'name', 'email')->paginate('2');
+        $user = User::select('id', 'name', 'email')->paginate(2);
 
         return [
             'status' => 200,
-            'menssagem' => 'Usuários encontrados!!',
+            'mensagem' => 'Usuários encontrados!',
             'user' => $user
         ];
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-
     }
 
     /**
@@ -44,7 +36,7 @@ class UserController extends Controller
      */
     public function store(UserCreateRequest $request)
     {
-        $data = $request->all();
+        $data = $request->validated();
 
         $user = User::create([
             'name' => $data['name'],
@@ -54,25 +46,9 @@ class UserController extends Controller
 
         return [
             'status' => 200,
-            'menssagem' => 'Usuário cadastrado com sucesso!!',
+            'mensagem' => 'Usuário cadastrado com sucesso!',
             'user' => $user
         ];
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
     }
 
     /**
@@ -80,7 +56,20 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        $data = $request->only(['name', 'email', 'password']);
+        if (isset($data['password'])) {
+            $data['password'] = bcrypt($data['password']);
+        }
+
+        $user->update($data);
+
+        return [
+            'status' => 200,
+            'mensagem' => 'Usuário atualizado com sucesso!',
+            'user' => $user
+        ];
     }
 
     /**
@@ -88,6 +77,12 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return [
+            'status' => 200,
+            'mensagem' => 'Usuário deletado com sucesso!'
+        ];
     }
 }
